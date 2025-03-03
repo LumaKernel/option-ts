@@ -1,4 +1,5 @@
 import { assertEquals, assertThrows } from "@std/assert";
+import { assertType, type IsExact } from "@std/testing/types";
 import { Option, OptionUnwrapOnNoneError } from "./mod.ts";
 
 // TODO: Not enough test.
@@ -36,5 +37,13 @@ Deno.test({
     assertEquals(some.is((v) => v === 1), true);
     assertEquals(some.is((v) => v === 2), false);
     assertEquals(none.is((v) => v === 123), true);
+  },
+});
+
+Deno.test({
+  name: "Option#unwrapOr",
+  fn() {
+    const v = Option.from(1).unwrapOr(null);
+    assertType<IsExact<typeof v, number | null>>(true);
   },
 });

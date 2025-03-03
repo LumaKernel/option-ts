@@ -130,13 +130,13 @@ export class Option<T> {
   zip<U>(other: Option<U>): Option<readonly [T, U]> {
     return Option.zip(this, other);
   }
-  unwrapOr(defaultValue: T): T {
+  unwrapOr<U>(defaultValue: U): T | U {
     if (this.isSome()) {
       return this.#value;
     }
     return defaultValue;
   }
-  unwrapOrElse(elseFn: () => T): T {
+  unwrapOrElse<U>(elseFn: () => U): T | U {
     if (this.isSome()) {
       return this.#value;
     }
