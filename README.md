@@ -5,8 +5,10 @@ Rust-like interface Option class.
 # Example
 
 ```ts
-const v = Option.fromNullish(await fetchSomething() /* which returns { something: number } | null */);
-const maybeSomething = v.map(e => e.something);
+const v = Option.fromNullish(
+  await fetchSomething(), /* which returns { something: number } | null */
+);
+const maybeSomething = v.map((e) => e.something);
 const unwrapped = maybeSomething.unwrapOr(Number.NaN);
 ```
 
@@ -27,11 +29,12 @@ match v {
 }
 ```
 
-But yes, that couldn't be possible even if using `.match()`. Instead you can do that as following.
+But yes, that couldn't be possible even if using `.match()`. Instead you can do
+that as following.
 
 ```ts
-await v.andThen(async(v) => await v.work()).awaited()
+await v.andThen(async (v) => await v.work()).awaited();
 ```
 
-The method `.awaited()` converts from `Option<Promise<T>>` into `Promise<Option<T>>`.
-
+The method `.awaited()` converts from `Option<Promise<T>>` into
+`Promise<Option<T>>`.
