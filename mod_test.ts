@@ -47,3 +47,19 @@ Deno.test({
     assertType<IsExact<typeof v, number | null>>(true);
   },
 });
+
+Deno.test({
+  name: "Option#filter",
+  fn() {
+    {
+      const v = Option.fromNullish("abc").filter((e) => e.length > 0);
+      assertEquals(v.unwrap(), "abc");
+      assertType<IsExact<typeof v, Option<string>>>(true);
+    }
+    {
+      const v = Option.fromNullish("abc").filter((e) => e === "xyz");
+      assertEquals(v.isNone(), true);
+      assertType<IsExact<typeof v, Option<"xyz">>>(true);
+    }
+  },
+});

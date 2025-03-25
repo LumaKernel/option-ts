@@ -71,6 +71,15 @@ export class Option<T> {
     }
     return Option.none();
   }
+  async mapAsync<U>(
+    mapFn: (value: T) => U,
+  ): Promise<Option<Awaited<U>>> {
+    if (this.isSome()) {
+      return Option.from(await mapFn(this.#value));
+    }
+    return Option.none();
+  }
+
   flatten(): T extends Option<infer I> ? Option<I> : Option<T> {
     if (this.isSome() && Option.isOption(this.#value)) {
       return this.#value as any;
@@ -95,16 +104,46 @@ export class Option<T> {
     }
     return Option.none();
   }
+  async andThenAsync<U>(
+    andThenFn: (value: T) => Option<U> | Promise<Option<U>>,
+  ): Promise<Option<U>> {
+    if (this.isSome()) {
+      return await andThenFn(this.#value);
+    }
+    return Option.none();
+  }
   orElse(orElseFn: () => Option<T>): Option<T> {
     if (this.isSome()) {
       return this;
     }
     return orElseFn();
   }
+  async orElseAsync(
+    orElseFn: () => Option<T> | Promise<Option<T>>,
+  ): Promise<Option<T>> {
+    if (this.isSome()) {
+      return this;
+    }
+    return await orElseFn();
+  }
   filter<P extends T>(
     predicate: (value: T) => value is P,
-  ): Option<P> {
+  ): Option<P>;
+  filter(
+    predicate: (value: T) => boolean,
+  ): Option<T>;
+  filter(
+    predicate: (value: T) => boolean,
+  ): Option<T> {
     if (this.isSome() && predicate(this.#value)) {
+      return Option.from(this.#value);
+    }
+    return Option.none();
+  }
+  async filterAsync(
+    predicate: (value: T) => boolean | Promise<boolean>,
+  ): Promise<Option<T>> {
+    if (this.isSome() && await predicate(this.#value)) {
       return Option.from(this.#value);
     }
     return Option.none();
@@ -112,6 +151,14 @@ export class Option<T> {
   filterMap<U>(filterMapFn: (value: T) => Option<U>): Option<U> {
     if (this.isSome()) {
       return filterMapFn(this.#value);
+    }
+    return Option.none();
+  }
+  async filterMapAsync<U>(
+    filterMapFn: (value: T) => Option<U> | Promise<Option<U>>,
+  ): Promise<Option<U>> {
+    if (this.isSome()) {
+      return await filterMapFn(this.#value);
     }
     return Option.none();
   }
@@ -141,6 +188,12 @@ export class Option<T> {
       return this.#value;
     }
     return elseFn();
+  }
+  async unwrapOrElseAsync<U>(elseFn: () => U): Promise<T | Awaited<U>> {
+    if (this.isSome()) {
+      return this.#value;
+    }
+    return await elseFn();
   }
   unwrap(this: Option<T>): T {
     if (this.isSome()) {
@@ -175,13 +228,13 @@ export class Option<T> {
     }
     return Option.from(value);
   }
-  toNullable(): T | null {
+  unwrapOrNull(): T | null {
     if (this.isSome()) {
       return this.#value;
     }
     return null;
   }
-  toOptional(): T | undefined {
+  unwrapOrUndefined(): T | undefined {
     if (this.isSome()) {
       return this.#value;
     }
