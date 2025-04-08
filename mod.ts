@@ -32,7 +32,7 @@ export class Option<T> {
   }
 
   // Only 2 static functions following are allowed to use the constructor.
-  static none<T>(): Option<T> {
+  static none<T = never>(): Option<T> {
     return new Option(optionInternalSymbol, false);
   }
   static from<T>(value: T): Option<T> {

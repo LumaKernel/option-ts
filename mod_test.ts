@@ -63,3 +63,14 @@ Deno.test({
     }
   },
 });
+
+Deno.test({
+  name: "Option#none",
+  fn() {
+    const f = (v: string) => {
+      if (v === "") return Option.none();
+      return Option.from(v);
+    };
+    assertType<IsExact<typeof f, (v: string) => Option<string>>>(true);
+  },
+});
